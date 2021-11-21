@@ -3,6 +3,7 @@ import pandas as pd
 import geopandas as gpd
 import matplotlib.pyplot as plt
 
+
 def geo_to_xyz(fi, lam, h, a, e2):
     fi = np.deg2rad(fi)
     lam = np.deg2rad(lam)
@@ -30,7 +31,23 @@ def geo_to_neu(F1, L1, H1, F2, L2, H2):
     neu = R @ D
     return neu
 
-# def odleg_skos(N,E,U):
+# funckja liczaca odleglosc skosna (w metrach)
+def odleg_skos(N, E, U):
+    return (N ** 2 + E ** 2 + U ** 2) ** 0.5
+
+# funckja liczaca azymut (w stopniach)
+def azymut(E, N):
+    if N == 0:
+        return 0
+    else:
+        az = np.rad2deg(np.arctan(E / N))
+        if (N < 0 and E > 0) or (N < 0 and E < 0):
+            return az + 180
+        elif N > 0 and E < 0:
+            return az + 360
+        else:
+            return az
+
 
 if __name__ == "__main__":
     a = 6378137  # metry
@@ -41,19 +58,27 @@ if __name__ == "__main__":
     L = 2.5517
     H = 404.00
 
-    # wspolrzedne lotniska w neu
-    data = np.genfromtxt('dane.txt',delimiter=';', dtype="U75")
+    # wczytanie danych lotu
+    data = np.genfromtxt('dane.txt', delimiter=';', dtype="U75")
     dane_fi = data[:, 0:1].astype(float).squeeze()
     dane_lam = data[:, 1:2].astype(float).squeeze()
     dane_h = data[:, 2:3].astype(float).squeeze()
-    geo_to_neu(F, L, H, dane_fi, dane_lam, dane_h)
-    
+
+    # obliczenia
+    n, e, u = geo_to_neu(F, L, H, dane_fi, dane_lam, dane_h)
+    print("odległość skośna:", odleg_skos(n, e, u))
+    b = np.vectorize(azymut)
+    print("azymut:", b(e, n))
+    print("odległość zenitalna:", u / odleg_skos(n, e, u))
+
+    # wyswietlenie trasy lotu 2d
     airport_data = pd.read_csv('dane2.txt', delimiter=';')
     airport_gdf = gpd.GeoDataFrame(airport_data, geometry=gpd.points_from_xy(airport_data['lam'],
                                                                              airport_data['fi']))
     airport_gdf.plot(markersize=1.5, figsize=(10, 10))
     plt.show()
 
+    # wyswietlenie trasy lotu 3d
     fig = plt.figure()
     ax = plt.axes(projection="3d")
     ax.plot3D(*geo_to_neu(F, L, H, dane_fi, dane_lam, dane_h), 'red')
