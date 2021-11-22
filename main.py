@@ -95,6 +95,8 @@ if __name__ == "__main__":
     ax = plt.axes(projection="3d")
     ax.plot3D(*geo_to_neu(F, L, H, dane_fi, dane_lam, dane_h), 'red')
     ax.scatter3D(*geo_to_neu(F, L, H, dane_fi, dane_lam, dane_h), cmap='cividis')
+    
+    # punkt, gdy samolot znika za horyzontem
     for a, b, c in zip(n, e, u):
         if c > 0:
             ax.plot3D(a, b, c, "red")
