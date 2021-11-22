@@ -4,6 +4,7 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 
 
+# przeliczanie wspolrzednych fi, lam, h na wspolrzedne x, y, z
 def geo_to_xyz(fi, lam, h, a, e2):
     fi = np.deg2rad(fi)
     lam = np.deg2rad(lam)
@@ -14,6 +15,7 @@ def geo_to_xyz(fi, lam, h, a, e2):
     return np.array((x, y, z))
 
 
+# przeliczanie wspolrzednych fi, lam, h na wspolrzedne n, e, u
 def geo_to_neu(F1, L1, H1, F2, L2, H2):
     pkt_1 = geo_to_xyz(F1, L1, H1, a, e2)
     pkt_2 = geo_to_xyz(F2, L2, H2, a, e2)
@@ -31,9 +33,11 @@ def geo_to_neu(F1, L1, H1, F2, L2, H2):
     neu = R @ D
     return neu
 
+
 # funckja liczaca odleglosc skosna (w metrach)
 def odleg_skos(N, E, U):
     return (N ** 2 + E ** 2 + U ** 2) ** 0.5
+
 
 # funckja liczaca azymut (w stopniach)
 def azymut(E, N):
@@ -47,6 +51,13 @@ def azymut(E, N):
             return az + 360
         else:
             return az
+
+
+def odleg_zenit(N, E, U):
+    if odleg_skos(N, E, U) != 0:
+        return U / odleg_skos(N, E, U)
+    else:
+        pass
 
 
 if __name__ == "__main__":
@@ -69,7 +80,8 @@ if __name__ == "__main__":
     print("odległość skośna:", odleg_skos(n, e, u))
     b = np.vectorize(azymut)
     print("azymut:", b(e, n))
-    print("odległość zenitalna:", u / odleg_skos(n, e, u))
+    c = np.vectorize(odleg_zenit)
+    print("odległość zenitalna:", c(n, e, u))
 
     # wyswietlenie trasy lotu 2d
     airport_data = pd.read_csv('dane2.txt', delimiter=';')
@@ -83,6 +95,12 @@ if __name__ == "__main__":
     ax = plt.axes(projection="3d")
     ax.plot3D(*geo_to_neu(F, L, H, dane_fi, dane_lam, dane_h), 'red')
     ax.scatter3D(*geo_to_neu(F, L, H, dane_fi, dane_lam, dane_h), cmap='cividis')
+    for a, b, c in zip(n, e, u):
+        if c > 0:
+            ax.plot3D(a, b, c, "red")
+            ax.text(a, b, c, '%s' % ("samolot znika za horyzontem"), size=10, zorder=1, color='k')
+            print("samolot zniknie za horyzontem we współrzędnych NEU: ", round(a, 3), round(b, 3), round(c, 3))
+            break
     ax.set_xlabel('$N$')
     ax.set_ylabel('$E$')
     plt.show()
