@@ -1,1 +1,1 @@
-# geo_wyzsza
+# 1 ćw pliki : main.py; dane.txt; dane2.txt
