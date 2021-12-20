@@ -1,4 +1,6 @@
 import numpy as np
+from mpl_toolkits import mplot3d
+import matplotlib.pyplot as plt
 
 # Gwiazda z gwiazdozbioru Byka - Elnath
 # Wawa / Nairobi (stolica Kenii) / Puerto Montt (miasto w Chile)
@@ -35,14 +37,33 @@ def odleg_zenit(fi, dek, t):
     dek = np.deg2rad(dek)
     t = np.deg2rad(t)
     z = np.sin(fi) * np.sin(dek) + np.cos(fi) * np.cos(dek) * np.cos(t)
+    z = np.rad2deg(z)
     return z
 
 def azymut(fi, dek, t): #tuuu dorobić
     fi = np.deg2rad(fi)
     dek = np.deg2rad(dek)
     t = np.deg2rad(t)
-    tag_A = (-np.cos(dek) * np.sin(t))/(np.cos(fi) * np.sin(dek) - np.sin(fi) * np.cos(dek) * np.cos(t))
+    licz = -np.cos(dek) * np.sin(t)
+    mian = np.cos(fi) * np.sin(dek) - np.sin(fi) * np.cos(dek) * np.cos(t)
+    tag_A = np.arctan(licz / mian)
+    tag_A = np.rad2deg(tag_A)
+    if mian < 0:
+        tag_A += 180
+    elif mian > 0 and licz < 0:
+        tag_A += 360
     return tag_A
+
+
+def wysokosc(fi, dek, t):
+    h = 90 - odleg_zenit(fi, dek, t)
+    return h
+
+def transf_wspol(fi, dek, t):
+    x = np.sin(np.deg2rad(odleg_zenit(fi, dek, t))) * np.cos(np.deg2rad(azymut(fi, dek, t)))
+    y = np.sin(np.deg2rad(odleg_zenit(fi, dek, t))) * np.sin(np.deg2rad(azymut(fi, dek, t)))
+    z = np.cos(np.deg2rad(odleg_zenit(fi, dek, t)))
+    return x, y, z
 
 def godzina_na_dzies(h, m, s):
     return h + m/60 + s / 3600
@@ -55,6 +76,7 @@ if __name__ == "__main__":
 
     godz = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
     godz = np.asarray(godz)
+
     # Rektascensja przeliczona już z godzin na stopnie
     rek = [81.92083, 81.92083, 81.92083, 81.92083, 81.92083, 81.92087, 81.92087, 81.92087, 81.92087, 81.92087,
            81.92087, 81.92087, 81.92087, 81.92087, 81.92087, 81.92087, 81.92087, 81.92087, 81.92087, 81.92087,
@@ -71,5 +93,22 @@ if __name__ == "__main__":
 
     i = 0
     while i < 25:
-        print("kąt godzinny dla Warszawy:", t_wawa[i],"godzina:", godz[i],)
+        #print("kąt godzinny dla Warszawy:", t_wawa[i],"godzina:", godz[i],)
         i = i+1
+
+    b = np.vectorize(azymut)
+    print("azymut dla wawy:", b(Wawa[0], dek, t_wawa))
+    c = np.vectorize(wysokosc)
+    print("wysokosc dla wawy:", c(Wawa[0], dek, t_wawa))
+    d = np.vectorize(transf_wspol)
+    x, y, z = d(Wawa[0], dek, t_wawa)
+
+    print(x,'\n', y,'\n', z)
+
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z');
+    ax.scatter3D(x, y, z, c=z, cmap='cividis');
+    plt.show()
