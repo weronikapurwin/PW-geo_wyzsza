@@ -1,6 +1,7 @@
 import numpy as np
-from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
+from matplotlib import cm
+
 
 # Gwiazda z gwiazdozbioru Byka - Elnath
 # Wawa / Nairobi (stolica Kenii) / Puerto Montt (miasto w Chile)
@@ -32,15 +33,17 @@ def kat_godzinny(y, m, d, h, lam, alfa):
     t = S - alfa
     return t
 
+
 def odleg_zenit(fi, dek, t):
     fi = np.deg2rad(fi)
     dek = np.deg2rad(dek)
     t = np.deg2rad(t)
     z = np.sin(fi) * np.sin(dek) + np.cos(fi) * np.cos(dek) * np.cos(t)
-    z = np.rad2deg(z)
+    z = np.rad2deg(np.arccos(z))
     return z
 
-def azymut(fi, dek, t): #tuuu dorobić
+
+def azymut(fi, dek, t):
     fi = np.deg2rad(fi)
     dek = np.deg2rad(dek)
     t = np.deg2rad(t)
@@ -54,7 +57,6 @@ def azymut(fi, dek, t): #tuuu dorobić
         tag_A += 360
     return tag_A
 
-
 def wysokosc(fi, dek, t):
     h = 90 - odleg_zenit(fi, dek, t)
     return h
@@ -64,9 +66,6 @@ def transf_wspol(fi, dek, t):
     y = np.sin(np.deg2rad(odleg_zenit(fi, dek, t))) * np.sin(np.deg2rad(azymut(fi, dek, t)))
     z = np.cos(np.deg2rad(odleg_zenit(fi, dek, t)))
     return x, y, z
-
-def godzina_na_dzies(h, m, s):
-    return h + m/60 + s / 3600
 
 if __name__ == "__main__":
     # współrzedne miejsc
@@ -86,29 +85,38 @@ if __name__ == "__main__":
            28.62483, 28.62483, 28.62483, 28.62483, 28.62483, 28.62483, 28.62483, 28.62483, 28.62483, 28.62483,
            28.62483, 28.62483, 28.62483, 28.62483, 28.62483]
 
-    print(15 * godzina_na_dzies(0, 32, 0))
     t_wawa = kat_godzinny(2021, 11, 30, godz, Wawa[1], rek)
     t_nairobi = kat_godzinny(2021, 11, 30, godz, Nairobi[1], rek)
     t_puerto_montt = kat_godzinny(2021, 11, 30, godz, Puerto_Montt[1], rek)
 
     i = 0
     while i < 25:
-        #print("kąt godzinny dla Warszawy:", t_wawa[i],"godzina:", godz[i],)
-        i = i+1
+        # print("kąt godzinny dla Warszawy:", t_wawa[i],"godzina:", godz[i],)
+        i = i + 1
 
     b = np.vectorize(azymut)
     print("azymut dla wawy:", b(Wawa[0], dek, t_wawa))
     c = np.vectorize(wysokosc)
     print("wysokosc dla wawy:", c(Wawa[0], dek, t_wawa))
     d = np.vectorize(transf_wspol)
-    x, y, z = d(Wawa[0], dek, t_wawa)
+    x_wa, y_wa, z_wa = d(Wawa[0], dek, t_wawa)
+    x_pm, y_pm, z_pm = d(Puerto_Montt[0], dek, t_puerto_montt)
+    x_n, y_n, z_n = d(Nairobi[0], dek, t_nairobi)
+    print(len(x_wa))
 
-    print(x,'\n', y,'\n', z)
+    u, v = np.mgrid[0:2 * np.pi:30j, 0:np.pi:20j]
+    x = np.cos(u) * np.sin(v)
+    y = np.sin(u) * np.sin(v)
+    z = np.cos(v)
 
     fig = plt.figure()
     ax = plt.axes(projection='3d')
+    ax.set_title("Ruch gwiazdy na niebie")
     ax.set_xlabel('x')
     ax.set_ylabel('y')
-    ax.set_zlabel('z');
-    ax.scatter3D(x, y, z, c=z, cmap='cividis');
+    ax.set_zlabel('z')
+    ax.plot_surface(x, y, z, alpha=0.05, facecolors=cm.jet(z/np.amax(z)))
+    ax.plot3D(x_wa, y_wa, z_wa, 'grey')
+    ax.scatter3D(x_wa, y_wa, z_wa, c='black', cmap='cividis')
+
     plt.show()
