@@ -89,10 +89,6 @@ if __name__ == "__main__":
     t_nairobi = kat_godzinny(2021, 11, 30, godz, Nairobi[1], rek)
     t_puerto_montt = kat_godzinny(2021, 11, 30, godz, Puerto_Montt[1], rek)
 
-    i = 0
-    while i < 25:
-        # print("kąt godzinny dla Warszawy:", t_wawa[i],"godzina:", godz[i],)
-        i = i + 1
 
     b = np.vectorize(azymut)
     print("azymut dla wawy:", b(Wawa[0], dek, t_wawa))
@@ -102,21 +98,40 @@ if __name__ == "__main__":
     x_wa, y_wa, z_wa = d(Wawa[0], dek, t_wawa)
     x_pm, y_pm, z_pm = d(Puerto_Montt[0], dek, t_puerto_montt)
     x_n, y_n, z_n = d(Nairobi[0], dek, t_nairobi)
-    print(len(x_wa))
 
     u, v = np.mgrid[0:2 * np.pi:30j, 0:np.pi:20j]
     x = np.cos(u) * np.sin(v)
     y = np.sin(u) * np.sin(v)
     z = np.cos(v)
 
+    #wykres
     fig = plt.figure()
     ax = plt.axes(projection='3d')
-    ax.set_title("Ruch gwiazdy na niebie")
+    ax.set_title("Ruch gwiazdy na niebie nad Warszawą")
     ax.set_xlabel('x')
     ax.set_ylabel('y')
     ax.set_zlabel('z')
     ax.plot_surface(x, y, z, alpha=0.05, facecolors=cm.jet(z/np.amax(z)))
     ax.plot3D(x_wa, y_wa, z_wa, 'grey')
     ax.scatter3D(x_wa, y_wa, z_wa, c='black', cmap='cividis')
+    plt.show()
 
+    ax = plt.axes(projection='3d')
+    ax.set_title("Ruch gwiazdy na niebie nad Nirobi")
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+    ax.plot_surface(x, y, z, alpha=0.05, facecolors=cm.jet(z / np.amax(z)))
+    ax.plot3D(x_n, y_n, z_n, 'grey')
+    ax.scatter3D(x_n, y_n, z_n, c='black', cmap='cividis')
+    plt.show()
+
+    ax = plt.axes(projection='3d')
+    ax.set_title("Ruch gwiazdy na niebie nad Puerto Montt")
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+    ax.plot_surface(x, y, z, alpha=0.05, facecolors=cm.jet(z / np.amax(z)))
+    ax.plot3D(x_pm, y_pm, z_pm, 'grey')
+    ax.scatter3D(x_pm, y_pm, z_pm, c='black', cmap='cividis')
     plt.show()
