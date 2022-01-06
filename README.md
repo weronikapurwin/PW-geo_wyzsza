@@ -5,7 +5,7 @@ WYNIKI:
  współrzędne punktu średniej szerokości: fi: 50°7'30.0'' lam: 21°0'0.0''
 
  Pierwsze uzycie algorytmu VINCENTEGO
- Długość linii geodezyjnej: 45303.16699 
+ Długość linii geodezyjnej: 45303.16699 m
  Azymut wprost: 127°40'53.30454'' 
  Azymut odwrotny: 307°55'13.51675''
 
