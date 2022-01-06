@@ -7,7 +7,8 @@ WYNIKI:
  Pierwsze uzycie algorytmu VINCENTEGO
  
  Długość linii geodezyjnej: 45303.16699 m
- Azymut wprost: 127°40'53.30454'' 
+ 
+ Azymut wprost: 127°40'53.30454'' /
  Azymut odwrotny: 307°55'13.51675''
 
  Użycie algorytmu KIJOVI
@@ -17,8 +18,10 @@ WYNIKI:
  Ponowne użycie algorytmu VINCENTEGO
  
  Różnica odległości pomiędzy punktem środkowym a punktem średniej szerokości: 166.92477 m 
- Azymut wprost: 17°22'38.93181'' 
+ 
+ Azymut wprost: 17°22'38.93181'' /
  Azymut odwrotny: 197°22'39.10363''
+ 
  Pole: 994265196.0813261 m^2
 
 
