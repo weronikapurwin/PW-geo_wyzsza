@@ -4,10 +4,14 @@ def punkt_sr_szer(a, b):
     return (a + b) / 2
 
 def dzies_na_stop(x):
-    h = np.floor(x)
-    m = np.floor((x - h) * 60)
+    h = int(x)
+    m = int((x - h) * 60)
     s = round((x - h - m/60) * 3600, 5)
-    return h, m, s
+    h = str(h) + "°"
+    m =str(m) + "'"
+    s = str(s) + "''"
+    hms = str(h+m+s)
+    return hms
 
 
 def vincent(a, e2, fi1, lam1, fi2, lam2):
@@ -60,26 +64,29 @@ def vincent(a, e2, fi1, lam1, fi2, lam2):
 
     num_ab = np.cos(U2) * np.sin(L2)
     denom_ab = np.cos(U1) * np.sin(U2) - np.sin(U1) * np.cos(U2) * np.cos(L2)
-    az_AB = np.rad2deg(np.arctan(num_ab / denom_ab))
-    if (denom_ab < 0):
-        az_AB += 180
-    elif denom_ab > 0 and num_ab < 0:
-        az_AB += 360
-        return az_AB
+    az_AB = np.arctan(num_ab / denom_ab)
+    if (num_ab > 0 and denom_ab > 0):
+        az_AB = np.rad2deg(az_AB)
+    elif (num_ab > 0 and denom_ab < 0) or (num_ab < 0 and denom_ab < 0):
+        az_AB = np.rad2deg(az_AB + np.pi)
+    elif (num_ab < 0 and denom_ab > 0):
+        az_AB = np.rad2deg(az_AB + 2 * np.pi)
 
     num_ba = np.cos(U2) * np.sin(L2)
     denom_ba = -np.sin(U1) * np.cos(U2) + np.cos(U1) * np.sin(U2) * np.cos(L2)
-    az_BA = np.rad2deg(np.arctan(num_ba / denom_ba) + np.pi)
-    if (denom_ba < 0):
-        az_BA += 180
-    elif denom_ba > 0 and num_ba < 0:
-        az_BA += 360
-        return az_BA
+    az_BA = np.arctan(num_ba / denom_ba)
+    if (num_ba > 0 and denom_ba > 0):
+        az_BA = np.rad2deg(az_BA + np.pi)
+    elif (num_ba > 0 and denom_ba < 0) or (num_ba < 0 and denom_ba < 0):
+        az_BA = np.rad2deg(az_BA + 2 * np.pi)
+    elif (num_ba < 0 and denom_ba > 0):
+        az_BA = np.rad2deg(az_BA + 3 * np.pi)
 
     return s_AB, az_AB, az_BA
 
 
 def kijovi(a, e2, fi, lam, AzAB, s):
+    s = s/2
     n = int(s / 1000)
     ds = 1000
     fi = np.deg2rad(fi)
@@ -87,7 +94,7 @@ def kijovi(a, e2, fi, lam, AzAB, s):
     AzAB = np.deg2rad(AzAB)
 
     for i in range(n):
-        M = (a * (1 - e2)) / ((1 - e2 * np.sin(fi)) ** 3) ** 0.5
+        M = (a * (1 - e2)) / (((1 - e2 * np.sin(fi)) ** 2) ** 3) ** 0.5
         N = a / (1 - (e2 * np.sin(fi) ** 2)) ** 0.5
 
         dfi = ds * np.cos(AzAB) / M
@@ -96,7 +103,7 @@ def kijovi(a, e2, fi, lam, AzAB, s):
         fi_m = fi + 0.5 * dfi
         Az_m = AzAB + 0.5 * dAzAB
 
-        Mm = (a * (1 - e2)) / ((1 - e2 * np.sin(fi_m)) ** 3) ** 0.5
+        Mm = (a * (1 - e2)) / (((1 - e2 * np.sin(fi_m)) ** 2) ** 3) ** 0.5
         Nm = a / (1 - (e2) * np.sin(fi_m) ** 2) ** 0.5
 
         dfim = np.cos(Az_m) * ds / Mm
@@ -108,7 +115,7 @@ def kijovi(a, e2, fi, lam, AzAB, s):
         AzAB =AzAB + dAz_m
 
     ds = s % 1000
-    M = (a * (1 - e2)) / ((1 - e2 * np.sin(fi)) ** 3) ** 0.5
+    M = (a * (1 - e2)) / (((1 - e2 * np.sin(fi)) ** 2) ** 3) ** 0.5
     N = a / (1 - (e2 * np.sin(fi) ** 2)) ** 0.5
 
     dfi = ds * np.cos(AzAB) / M
@@ -117,7 +124,7 @@ def kijovi(a, e2, fi, lam, AzAB, s):
     fi_m = fi + 0.5 * dfi
     Az_m = AzAB + 0.5 * dAzAB
 
-    Mm = (a * (1 - e2)) / ((1 - e2 * np.sin(fi_m)) ** 3) ** 0.5
+    Mm = (a * (1 - e2)) / (((1 - e2 * np.sin(fi_m)) ** 2) ** 3) ** 0.5
     Nm = a / (1 - (e2) * np.sin(fi_m) ** 2) ** 0.5
 
     dfim = np.cos(Az_m) * ds / Mm
@@ -130,9 +137,9 @@ def kijovi(a, e2, fi, lam, AzAB, s):
 
     fi = np.rad2deg(fi)
     lam = np.rad2deg(lam)
-    #AzBA = np.rad2deg(AzAB)
     AzAB = np.rad2deg(AzAB)
     return fi, lam, AzAB
+
 
 def pole(fi1, lam1, fi2, lam2):
     e2 = 0.0066943800290
@@ -153,7 +160,6 @@ def pole(fi1, lam1, fi2, lam2):
     p = b ** 2 * (lam2 - lam1) * 0.5 * integral
     return p
 
-
 if __name__ == "__main__":
     A = [50.25, 20.75]
     B = [50, 20.75]
@@ -163,25 +169,27 @@ if __name__ == "__main__":
     a = 6378137  # metry
     e2 = 0.0066943800290  # bez jednostek
 
-    print("współrzędne punktu średniej szerokości:", "fi:", punkt_sr_szer(B[0], C[0]), "lam:", punkt_sr_szer(B[1], C[1]))
-
-    print("algorytm VINCENTEGO")
-    s, a_ab, a_ba = vincent(a,e2,A[0], A[1], D[0], D[1])
-    print("długość linii geodezyjnej:", round(s, 5), '\n', "Azymut AD:", round(a_ab, 5), '\n', "Azymut DA:", round(a_ba,5))
-
-    print("algorytm KIJOVI")
-    fi, lam, az_12 = kijovi(a, e2, A[0], A[1], a_ab, s)
-    print("współrzędne punktu środkowego:", "fi:", round(fi, 5), "lam:", round(lam, 5),
-          '\n', "Azymut AD:", az_12)
-
-    print("algorytm VINCENTEGO znowu")
     x = punkt_sr_szer(B[0], C[0])
     y = punkt_sr_szer(B[1], C[1])
-    s1, a_xy, a_yx = vincent(a,e2, x, y, fi, lam)
-    print("Różnica odległości:", round(s1, 5),"Azymut wprost:", a_xy,'\n' "Azymut odwrotny:", a_yx)
+
+    print("współrzędne punktu średniej szerokości:", "fi:", dzies_na_stop(x), "lam:", dzies_na_stop(y))
+
+    print('\n',"Pierwsze uzycie algorytmu VINCENTEGO")
+    s, a_ab, a_ba = vincent(a,e2,A[0], A[1], D[0], D[1])
+    print(" Długość linii geodezyjnej:", round(s, 5), '\n', "Azymut wprost", dzies_na_stop(a_ab), '\n', "Azymut odwrotny:",
+          dzies_na_stop(a_ba))
+
+    print('\n',"Użycie algorytmu KIJOVI")
+    fi, lam, az_12 = kijovi(a, e2, A[0], A[1], a_ab, s)
+    print(" Współrzędne punktu środkowego:", "fi:", dzies_na_stop(fi), "lam:", dzies_na_stop(lam))
+
+    print('\n', "Ponowne użycie algorytmu VINCENTEGO")
+    s1, a_xy, a_yx = vincent(a, e2, x, y, fi, lam)
+    print(" Różnica odległości pomiędzy punktem środkowym a punktem średniej szerokości:", round(s1, 5),"m", '\n', "Azymut wprost:", dzies_na_stop(a_xy), '\n', "Azymut odwrotny:",
+          dzies_na_stop(a_yx))
 
     p = pole(A[0], A[1], D[0], D[1])
-    print("pole:", p)
+    print(" Pole:", p, "m^2")
 
 
 
