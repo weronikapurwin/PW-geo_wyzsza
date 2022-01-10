@@ -89,6 +89,53 @@ if __name__ == "__main__":
     t_nairobi = kat_godzinny(2021, 11, 30, godz, Nairobi[1], rek)
     t_puerto_montt = kat_godzinny(2021, 11, 30, godz, Puerto_Montt[1], rek)
 
+    # wysokosc gwiazdy nad horyzontem od czasu
+    h_wawa = wysokosc(Wawa[0], dek, t_wawa)
+    h_puerto_montt = wysokosc(Puerto_Montt[0], dek, t_puerto_montt)
+    h_nairobi = wysokosc(Nairobi[0], dek, t_nairobi)
+
+    z_wawa = odleg_zenit(Wawa[0], dek, t_wawa)
+    z_puerto_montt = odleg_zenit(Puerto_Montt[0], dek, t_puerto_montt)
+    z_nairobi = odleg_zenit(Nairobi[0], dek, t_nairobi)
+
+    # odległośc zenitalna gwiazd
+    plt.plot(godz, z_wawa)
+    plt.xlabel('Czas (h)')
+    plt.ylabel('Odległość zenitalna gwiazdy')
+    plt.title('Odległość zenitalna gwiazdy w zależności od czasu (Warszawa)')
+    plt.show()
+
+    plt.plot(godz, z_puerto_montt)
+    plt.xlabel('Czas (h)')
+    plt.ylabel('Odległość zenitalna gwiazdy')
+    plt.title('Odległość zenitalna gwiazdy w zależności od czasu (Puerto Montt)')
+    plt.show()
+
+    plt.plot(godz, z_nairobi)
+    plt.xlabel('Czas (h)')
+    plt.ylabel('Odległość zenitalna gwiazdy')
+    plt.title('Odległość zenitalna gwiazdy w zależności od czasu (Nairobi)')
+    plt.show()
+
+    #wykresy wysokości gwiazdy nad horyzontem
+    plt.plot(godz, h_wawa)
+    plt.xlabel('Czas (h)')
+    plt.ylabel('Wysokośc gwiazdy nad horyzontem')
+    plt.title('Wysokość gwiazdy nad horyzontem w zależności od czasu (Warszawa)')
+    plt.show()
+
+    plt.plot(godz, h_puerto_montt)
+    plt.xlabel('Czas (h)')
+    plt.ylabel('Wysokośc gwiazdy nad horyzontem')
+    plt.title('Wysokość gwiazdy nad horyzontem w zależności od czasu (Puerto Montt)')
+    plt.show()
+
+    plt.plot(godz, h_nairobi)
+    plt.xlabel('Czas (h)')
+    plt.ylabel('Wysokośc gwiazdy nad horyzontem')
+    plt.title('Wysokość gwiazdy nad horyzontem w zależności od czasu (Nairobi)')
+    plt.show()
+
 
     b = np.vectorize(azymut)
     print("azymut dla wawy:", b(Wawa[0], dek, t_wawa))
@@ -117,7 +164,7 @@ if __name__ == "__main__":
     plt.show()
 
     ax = plt.axes(projection='3d')
-    ax.set_title("Ruch gwiazdy na niebie nad Nirobi")
+    ax.set_title("Ruch gwiazdy na niebie nad Nairobi")
     ax.set_xlabel('x')
     ax.set_ylabel('y')
     ax.set_zlabel('z')
