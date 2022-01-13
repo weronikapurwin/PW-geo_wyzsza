@@ -23,6 +23,6 @@ WYNIKI:
  Azymut odwrotny: 197°22'39.10363''
  
  Pole: 994265196.0813261 m^2
-
+# 4 ćw plik: zad4.py
 
 
