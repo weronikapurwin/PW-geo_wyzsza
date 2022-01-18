@@ -24,5 +24,6 @@ WYNIKI:
  
  Pole: 994265196.0813261 m^2
 # 4 ćw plik: zad4.py
+# 5 ćw plik: main.py
 
 
