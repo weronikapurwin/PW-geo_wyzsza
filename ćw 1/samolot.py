@@ -98,7 +98,7 @@ if __name__ == "__main__":
     
     # punkt, gdy samolot znika za horyzontem
     for a, b, c in zip(n, e, u):
-        if c > 0:
+        if c < 0:
             ax.plot3D(a, b, c, "red")
             ax.text(a, b, c, '%s' % ("samolot znika za horyzontem"), size=10, zorder=1, color='k')
             print("samolot zniknie za horyzontem we współrzędnych NEU: ", round(a, 3), round(b, 3), round(c, 3))
